@@ -314,7 +314,8 @@ noinst_PROGRAMS += \
 	frob-request \
 	frob-system-prompt \
 	frob-unlock \
-	frob-unlock-options
+	frob-unlock-options \
+	frob-object-chooser
 
 frob_certificate_SOURCES = ui/frob-certificate.c
 frob_certificate_CFLAGS = $(ui_CFLAGS)
@@ -360,3 +361,7 @@ frob_unlock_LDADD = $(ui_LIBS)
 frob_unlock_options_SOURCES = ui/frob-unlock-options.c
 frob_unlock_options_CFLAGS = $(ui_CFLAGS)
 frob_unlock_options_LDADD = $(ui_LIBS)
+
+frob_object_chooser_SOURCES = ui/frob-object-chooser.c
+frob_object_chooser_CFLAGS = $(ui_CFLAGS)
+frob_object_chooser_LDADD = $(ui_LIBS)
