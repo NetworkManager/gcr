@@ -32,6 +32,8 @@ ui/gcr-pkcs11-import-dialog.c
 ui/gcr-pkcs11-import-interaction.c
 ui/gcr-prompt-dialog.c
 ui/gcr-prompter.desktop.in.in
+ui/gcr-token-login-dialog.c
+[type: gettext/glade]ui/gcr-token-login-dialog.ui
 ui/gcr-certificate-exporter.c
 [type: gettext/glade]ui/gcr-unlock-options-widget.ui
 ui/gcr-unlock-renderer.c

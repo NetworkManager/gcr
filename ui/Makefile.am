@@ -62,6 +62,7 @@ ui_HEADER_FILES = \
 	ui/gcr-prompt-dialog.h \
 	ui/gcr-renderer.h \
 	ui/gcr-secure-entry-buffer.h \
+	ui/gcr-token-login-dialog.h \
 	ui/gcr-tree-selector.h \
 	ui/gcr-unlock-options-widget.h \
 	ui/gcr-viewer.h \
@@ -107,6 +108,7 @@ ui_PRIVATE_FILES = \
 	ui/gcr-live-search.c ui/gcr-live-search.h \
 	ui/gcr-pkcs11-import-dialog.c ui/gcr-pkcs11-import-dialog.h \
 	ui/gcr-pkcs11-import-interaction.c ui/gcr-pkcs11-import-interaction.h \
+	ui/gcr-token-login-dialog.c ui/gcr-token-login-dialog.h \
 	ui/gcr-unlock-renderer.c ui/gcr-unlock-renderer.h \
 	ui/gcr-viewer-window.c ui/gcr-viewer-window.h \
 	$(NULL)
