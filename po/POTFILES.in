@@ -27,6 +27,8 @@ ui/gcr-failure-renderer.c
 ui/gcr-gnupg-renderer.c
 ui/gcr-import-button.c
 ui/gcr-key-renderer.c
+ui/gcr-object-chooser-button.c
+[type: gettext/glade] ui/gcr-object-chooser-button.ui
 ui/gcr-object-chooser-widget.c
 [type: gettext/glade]ui/gcr-object-chooser-widget.ui
 ui/gcr-pkcs11-import-dialog.c

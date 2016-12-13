@@ -59,6 +59,7 @@ ui_HEADER_FILES = \
 	ui/gcr-key-widget.h \
 	ui/gcr-import-button.h \
 	ui/gcr-list-selector.h \
+	ui/gcr-object-chooser-button.h \
 	ui/gcr-object-chooser-dialog.h \
 	ui/gcr-object-chooser.h \
 	ui/gcr-object-chooser-widget.h \
@@ -89,6 +90,7 @@ ui_PUBLIC_FILES = \
 	ui/gcr-list-selector.c ui/gcr-list-selector.h \
 	ui/gcr-object-chooser.c ui/gcr-object-chooser.h \
 	ui/gcr-object-chooser-dialog.c ui/gcr-object-chooser-dialog.h \
+	ui/gcr-object-chooser-button.c ui/gcr-object-chooser-button.h \
 	ui/gcr-prompt-dialog.c ui/gcr-prompt-dialog.h \
 	ui/gcr-renderer.c ui/gcr-renderer.h \
 	ui/gcr-secure-entry-buffer.c ui/gcr-secure-entry-buffer.h \

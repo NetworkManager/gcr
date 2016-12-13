@@ -7,5 +7,6 @@
 		<file preprocess="xml-stripblanks">gcr-object-chooser-widget.ui</file>
 		<file preprocess="xml-stripblanks">gcr-token-login-dialog.ui</file>
 		<file preprocess="xml-stripblanks">gcr-tokens-sidebar-row.ui</file>
+		<file preprocess="xml-stripblanks">gcr-object-chooser-button.ui</file>
 	</gresource>
 </gresources>
