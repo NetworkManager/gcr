@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.20.0 -->
+<interface domain="gtk30">
+  <requires lib="gtk+" version="3.10"/>
+  <template class="GcrTokensSidebarRow" parent="GtkListBoxRow">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="margin_top">1</property>
+    <property name="margin_bottom">1</property>
+    <child>
+      <object class="GtkRevealer" id="revealer">
+        <property name="visible">1</property>
+        <property name="reveal-child">1</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkEventBox" id="event_box">
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkBox">
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkImage" id="icon_widget">
+                    <property name="can_focus">False</property>
+                    <property name="icon_name">media-flash-symbolic</property>
+                    <style>
+                      <class name="sidebar-icon"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label_widget">
+                    <property name="can_focus">False</property>
+                    <property name="hexpand">False</property>
+                    <property name="xalign">0</property>
+                    <style>
+                      <class name="sidebar-label"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="login_button">
+                    <property name="can_focus">False</property>
+                    <property name="receives_default">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="margin_start">4</property>
+                    <signal name="clicked" handler="login_clicked" swapped="no"/>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="can_focus">False</property>
+                        <property name="icon_name">dialog-password-symbolic</property>
+                        <property name="icon_size">1</property>
+                      </object>
+                    </child>
+                    <style>
+                      <class name="image-button"/>
+                      <class name="sidebar-button"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <style>
+          <class name="sidebar-revealer"/>
+        </style>
+      </object>
+    </child>
+    <style>
+      <class name="sidebar-row"/>
+    </style>
+  </template>
+  <object class="GtkSizeGroup">
+    <property name="mode">vertical</property>
+    <widgets>
+      <widget name="login_button"/>
+      <widget name="label_widget"/>
+      <widget name="icon_widget"/>
+    </widgets>
+  </object>
+</interface>
