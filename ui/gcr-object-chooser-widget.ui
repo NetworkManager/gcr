@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.20.0 -->
+<interface domain="gtk30">
+  <requires lib="gtk+" version="3.10"/>
+  <template class="GcrObjectChooserWidget" parent="GtkBox">
+    <property name="can_focus">False</property>
+    <property name="orientation">vertical</property>
+    <child>
+      <object class="GtkRevealer" id="error_revealer">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkInfoBar" id="error_bar">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="message_type">error</property>
+            <property name="show_close_button">True</property>
+            <signal name="response" handler="error_close" swapped="no"/>
+            <child internal-child="action_area">
+              <object class="GtkButtonBox">
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child internal-child="content_area">
+              <object class="GtkBox">
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkLabel" id="error_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkPaned" id="paned">
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GcrTokensSidebar" id="tokens_sidebar">
+        <property name="can_focus">False</property>
+        <property name="hscrollbar_policy">never</property>
+        <signal name="token-added" handler="token_added" swapped="no"/>
+        <signal name="token-login" handler="token_login" swapped="no"/>
+        <signal name="open-token" handler="open_token" swapped="no"/>
+        <style>
+          <class name="sidebar"/>
+        </style>
+      </object>
+          <packing>
+            <property name="resize">False</property>
+            <property name="shrink">False</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow">
+            <property name="can_focus">False</property>
+            <property name="hscrollbar_policy">never</property>
+            <child>
+              <object class="GtkTreeView" id="objects_view">
+                <property name="can_focus">False</property>
+                <property name="enable_search">False</property>
+                <signal name="cursor-changed" handler="cursor_changed" swapped="no"/>
+                <signal name="row-activated" handler="row_activated" swapped="no"/>
+                <child internal-child="selection">
+                  <object class="GtkTreeSelection" id="objects_view_selection"/>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn" id="list_name_column">
+                    <property name="title" translatable="yes">Name</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="list_name_renderer">
+                        <property name="xpad">6</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn" id="list_issued_by_column">
+                    <property name="title" translatable="yes">Issued By</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="list_issued_by_renderer">
+                        <property name="xpad">6</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="resize">True</property>
+            <property name="shrink">True</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">True</property>
+        <property name="fill">True</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+  </template>
+</interface>

@@ -65,6 +65,8 @@ gcr_list_selector_set_selected
 gcr_object_chooser_get_type
 gcr_object_chooser_get_uri
 gcr_object_chooser_set_uri
+gcr_object_chooser_widget_get_type
+gcr_object_chooser_widget_new
 gcr_prompt_dialog_get_type
 gcr_renderer_create
 gcr_renderer_emit_data_changed

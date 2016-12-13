@@ -60,6 +60,7 @@ ui_HEADER_FILES = \
 	ui/gcr-import-button.h \
 	ui/gcr-list-selector.h \
 	ui/gcr-object-chooser.h \
+	ui/gcr-object-chooser-widget.h \
 	ui/gcr-prompt-dialog.h \
 	ui/gcr-renderer.h \
 	ui/gcr-secure-entry-buffer.h \
@@ -110,6 +111,7 @@ ui_PRIVATE_FILES = \
 	ui/gcr-gnupg-renderer.c ui/gcr-gnupg-renderer.h \
 	ui/gcr-list-selector-private.h \
 	ui/gcr-live-search.c ui/gcr-live-search.h \
+	ui/gcr-object-chooser-widget.c ui/gcr-object-chooser-widget.h \
 	ui/gcr-pkcs11-import-dialog.c ui/gcr-pkcs11-import-dialog.h \
 	ui/gcr-pkcs11-import-interaction.c ui/gcr-pkcs11-import-interaction.h \
 	ui/gcr-token-login-dialog.c ui/gcr-token-login-dialog.h \
