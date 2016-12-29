@@ -56,14 +56,6 @@ extern GList           *stored_uri;
 
 extern GList           *stored_password;
 
-gchar                   *cert_uri = NULL;
-
-gchar                   *cert_password = NULL;
-
-gchar                   *key_uri = NULL;
-
-gchar                   *key_password = NULL;
-
 GcrCertificateChooserDialog * gcr_certificate_chooser_dialog_new    (GtkWindow *parent);
 
 GcrCertificateChooserSidebar * gcr_certificate_chooser_sidebar_new    (void);

@@ -24,6 +24,7 @@
 #include "gcr/gcr.h"
 #include "gcr-dialog-util.h"
 #include "gcr-secure-entry-buffer.h"
+#include "gcr-certificate-chooser.h"
 #include "gcr-certificate-chooser-dialog.h"
 #include "gcr-certificate-chooser-pkcs11.c"
 #include "gcr-viewer.h"
@@ -80,12 +81,15 @@ struct _GcrCertificateChooserDialog {
        GtkWidget *hbox;
        GBytes *data;
        GcrCertificateChooserSidebar *token_sidebar;
-       char *certificate_uri;
-       char *key_uri;
        GcrParser *parser;
        gboolean is_certificate_choosen;
        gboolean is_key_choosen;
        gint password_wrong_count;
+
+       gchar *cert_uri;
+       gchar *cert_password;
+       gchar *key_password;
+       gchar *key_uri;
 };
 
 struct _GcrCertificateChooserSidebar {
@@ -130,7 +134,10 @@ enum {
         N_COLUMNS
 };
 
-G_DEFINE_TYPE (GcrCertificateChooserDialog, gcr_certificate_chooser_dialog, GTK_TYPE_DIALOG);
+static void dialog_gcr_certificate_chooser_iface_init (GcrCertificateChooserInterface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (GcrCertificateChooserDialog, gcr_certificate_chooser_dialog, GTK_TYPE_DIALOG,
+                         G_IMPLEMENT_INTERFACE (GCR_TYPE_CERTIFICATE_CHOOSER, dialog_gcr_certificate_chooser_iface_init));
 G_DEFINE_TYPE (GcrCertificateChooserSidebar, gcr_certificate_chooser_sidebar, GTK_TYPE_SCROLLED_WINDOW);
 
 static void
@@ -187,6 +194,26 @@ update_file_chooser_filefilter (GcrCertificateChooserDialog *self)
                  gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (gtk_builder_get_object (self->builder, "filechooser")),
                                               GTK_FILE_FILTER (gtk_builder_get_object (self->builder, "cert-filefilter")));
         }
+}
+
+static void
+on_certificate_selected (GcrCertificateChooserPkcs11 *pkcs11, gpointer user_data)
+{
+	GcrCertificateChooserDialog *self = GCR_CERTIFICATE_CHOOSER_DIALOG(user_data);
+
+	gcr_certificate_chooser_set_cert_uri (GCR_CERTIFICATE_CHOOSER(self),
+	                                      gcr_certificate_chooser_get_cert_uri (GCR_CERTIFICATE_CHOOSER(pkcs11)));
+
+	gcr_certificate_chooser_set_cert_password (GCR_CERTIFICATE_CHOOSER(self),
+	                                           gcr_certificate_chooser_get_cert_password (GCR_CERTIFICATE_CHOOSER(pkcs11)));
+
+	gcr_certificate_chooser_set_key_uri (GCR_CERTIFICATE_CHOOSER(self),
+	                                      gcr_certificate_chooser_get_key_uri (GCR_CERTIFICATE_CHOOSER(pkcs11)));
+
+	gcr_certificate_chooser_set_key_password (GCR_CERTIFICATE_CHOOSER(self),
+	                                           gcr_certificate_chooser_get_key_password (GCR_CERTIFICATE_CHOOSER(pkcs11)));
+
+	g_signal_emit_by_name (self, "certificate-selected");
 }
 
 static void
@@ -250,6 +277,9 @@ on_token_select (GtkTreeModel *model,
 
                           gtk_paned_add2(GTK_PANED(gtk_builder_get_object(self->builder, "selection-page")), GTK_WIDGET(data));
                           gtk_widget_show_all(GTK_WIDGET(gtk_builder_get_object(self->builder, "selection-page")));
+
+                          g_signal_connect(data, "certificate-selected", G_CALLBACK (on_certificate_selected), self);
+
                  } else {
                           GCR_CERTIFICATE_CHOOSER_PKCS11 (widget)->certificate_choosen = certificate_choosen;
                           update_object (GCR_CERTIFICATE_CHOOSER_PKCS11 (widget));
@@ -324,10 +354,12 @@ static void
 on_confirm_button_clicked (GtkWidget *widget,
                            gpointer data)
 {
-        printf ("The selected certificate uri is %s\n", cert_uri);
-        printf ("The selected certificate password is %s\n", cert_password);
-        printf ("The selected key uri is %s\n", key_uri);
-        printf ("The selected key password is %s\n", key_password);
+	GcrCertificateChooserDialog *self = GCR_CERTIFICATE_CHOOSER_DIALOG (data);
+
+        printf ("The selected certificate uri is %s\n", self->cert_uri);
+        printf ("The selected certificate password is %s\n", self->cert_password);
+        printf ("The selected key uri is %s\n", self->key_uri);
+        printf ("The selected key password is %s\n", self->key_password);
 }
 
 static void
@@ -345,7 +377,7 @@ on_choose_again_button_clicked(GtkWidget *widget,
        self->is_certificate_choosen = FALSE;
        self->is_key_choosen = FALSE;
        self->key_uri = NULL;
-       self->certificate_uri = NULL;
+       self->cert_uri = NULL;
 
        gtk_tree_view_set_cursor (GTK_TREE_VIEW (self->token_sidebar->tree_view), gtk_tree_path_new_from_string("0"), NULL, FALSE);
 
@@ -380,13 +412,13 @@ set_cert_uri_and_password_from_file (GcrCertificateChooserDialog *self)
         l = stored_password;
         for (m = stored_uri; m != NULL; m = g_list_next (m)) {
 
-                 if (!g_strcmp0 (m->data, cert_uri)) {
-                          cert_password = l->data;
+                 if (!g_strcmp0 (m->data, self->cert_uri)) {
+                          self->cert_password = l->data;
                           return ;
                  }
                  l = g_list_next (l);
         }
-        cert_password = NULL;
+        self->cert_password = NULL;
 }
 
 /**
@@ -403,13 +435,13 @@ set_key_uri_and_password_from_file (GcrCertificateChooserDialog *self)
         l = stored_password;
         for (m = stored_uri; m != NULL; m = g_list_next (m)) {
 
-                 if (!g_strcmp0 ((gchar *)m->data, key_uri)) {
-                          key_password = (gchar *)l->data;
+                 if (!g_strcmp0 ((gchar *)m->data, self->key_uri)) {
+                          self->key_password = (gchar *)l->data;
                           return ;
                  }
                  l = g_list_next (l);
         }
-        key_password = NULL;
+        self->key_password = NULL;
 }
 
 /**
@@ -419,7 +451,7 @@ set_key_uri_and_password_from_file (GcrCertificateChooserDialog *self)
  * set the cert object uri and password that has came from pkcs11 token
  */
 static void
-set_cert_uri_and_password_from_pkcs11 (GtkWidget *widget)
+set_cert_uri_and_password_from_pkcs11 (GcrCertificateChooserDialog *self, GtkWidget *widget)
 {
         GcrCertificateChooserPkcs11 *pkcs11 = GCR_CERTIFICATE_CHOOSER_PKCS11 (widget);
         GList *l, *m;
@@ -429,12 +461,12 @@ set_cert_uri_and_password_from_pkcs11 (GtkWidget *widget)
         for (m = stored_uri; m != NULL; m = g_list_next (m)){
 
                  if (!g_strcmp0 ((gchar *)m->data, uri)) {
-                          cert_password = (gchar *)l->data;
+                          self->cert_password = (gchar *)l->data;
                           return;
                  }
                  l = g_list_next (l);
         }
-        cert_password = NULL;
+        self->cert_password = NULL;
 }
 
 /**
@@ -444,7 +476,7 @@ set_cert_uri_and_password_from_pkcs11 (GtkWidget *widget)
  * set the key object uri and pasword that has came from pkcs11 token
  */
 static void
-set_key_uri_and_password_from_pkcs11 (GtkWidget *widget)
+set_key_uri_and_password_from_pkcs11 (GcrCertificateChooserDialog *self, GtkWidget *widget)
 {
         GcrCertificateChooserPkcs11 *pkcs11 = GCR_CERTIFICATE_CHOOSER_PKCS11 (widget);
         GList *l, *m;
@@ -454,12 +486,12 @@ set_key_uri_and_password_from_pkcs11 (GtkWidget *widget)
         for (m = stored_uri; m != NULL; m = g_list_next (m)){
 
                  if (!g_strcmp0 ((gchar *)m->data, uri)) {
-                          key_password = (gchar *)l->data;
+                          self->key_password = (gchar *)l->data;
                           return;
                  }
                  l = g_list_next (l);
         }
-        key_password = NULL;
+        self->key_password = NULL;
 }
 
 /**
@@ -493,8 +525,8 @@ on_next_button_clicked(GtkWidget *widget, gpointer *data)
                                    set_key_uri_and_password_from_file (self);
                                    set_cert_uri_and_password_from_file (self);
                           } else {
-                                   set_key_uri_and_password_from_pkcs11 (current_token);
-                                   set_cert_uri_and_password_from_pkcs11 (current_token);
+                                   set_key_uri_and_password_from_pkcs11 (self, current_token);
+                                   set_cert_uri_and_password_from_pkcs11 (self, current_token);
                           }
 
                           gtk_stack_set_visible_child(GTK_STACK(gtk_builder_get_object(
@@ -506,7 +538,7 @@ on_next_button_clicked(GtkWidget *widget, gpointer *data)
                                                  self->builder, "next-button")),FALSE);
                  } else {
                           if (type == TYPE_PKCS11) {
-                                   set_cert_uri_and_password_from_pkcs11 (current_token);
+                                   set_cert_uri_and_password_from_pkcs11 (self, current_token);
                                    GCR_CERTIFICATE_CHOOSER_PKCS11 (current_token)->certificate_choosen = TRUE;
                                    update_object (GCR_CERTIFICATE_CHOOSER_PKCS11 (current_token));
                           } else {
@@ -523,7 +555,7 @@ on_next_button_clicked(GtkWidget *widget, gpointer *data)
                  if (type == TYPE_FILE_SYSTEM)
                           set_key_uri_and_password_from_file (self);
                  else
-                          set_key_uri_and_password_from_pkcs11 (current_token);
+                          set_key_uri_and_password_from_pkcs11 (self, current_token);
 
                  gtk_stack_set_visible_child(GTK_STACK(gtk_builder_get_object(
                                              self->builder, "content-area")),
@@ -559,7 +591,7 @@ on_parser_parsed_item(GcrParser *parser,
                           GcrCertificate *certificate = gcr_certificate_renderer_get_certificate (renderer);
                           gcr_certificate_widget_set_certificate (GCR_CERTIFICATE_WIDGET (gtk_builder_get_object
                                                                  (self->builder, "certficate-info")), certificate);
-                          cert_uri = gtk_file_chooser_get_uri (chooser);
+                          self->cert_uri = gtk_file_chooser_get_uri (chooser);
                  } else if (gck_attributes_find_ulong (attributes, CKA_CLASS, &class) && class == CKO_PRIVATE_KEY) {
 
                           gtk_label_set_text(GTK_LABEL(gtk_builder_get_object(
@@ -570,7 +602,7 @@ on_parser_parsed_item(GcrParser *parser,
                                                                          (self->builder, "key-info")), attributes);
 
                           self->is_key_choosen = TRUE;
-                          key_uri = gtk_file_chooser_get_uri (chooser);
+                          self->key_uri = gtk_file_chooser_get_uri (chooser);
                  }
         } else {
 
@@ -586,9 +618,11 @@ on_parser_parsed_item(GcrParser *parser,
                           gcr_key_widget_set_attributes (GCR_KEY_WIDGET (gtk_builder_get_object
                                                                         (self->builder, "key-info")), attributes);
 
-                          key_uri = gtk_file_chooser_get_uri (chooser);
+                          self->key_uri = gtk_file_chooser_get_uri (chooser);
                   }
         }
+
+	g_signal_emit_by_name (self, "certificate-selected");
 }
 
 static void
@@ -720,10 +754,10 @@ on_update_preview(GtkWidget *widget, gpointer *user_data)
 #if 0
 	/* XXX: No, why? Filename is a file system path ("/dir/dir/file")
 	 * while the cert_uri for that path is an URI ("file:///dir/dir/file"). */
-	if (self->certificate_uri && g_strcmp0(self->certificate_uri,
+	if (self->cert_uri && g_strcmp0(self->cert_uri,
                                                filename) != 0) {
-		g_free(self->certificate_uri);
-		self->certificate_uri = NULL;
+		g_free(self->cert_uri);
+		self->cert_uri = NULL;
 	}
 #endif
 	g_free(filename);
@@ -964,6 +998,103 @@ gcr_certificate_chooser_dialog_finalize (GObject *obj)
 	//GcrCertificateChooserDialog *self = GCR_CERTIFICATE_CHOOSER_DIALOG (obj);
 
 	G_OBJECT_CLASS (gcr_certificate_chooser_dialog_parent_class)->finalize (obj);
+}
+
+static void
+gcr_certificate_chooser_dialog_set_cert_uri (GcrCertificateChooser *self, const gchar *cert_uri)
+{
+	GcrCertificateChooserDialog *dialog;
+
+	g_return_if_fail (GCR_IS_CERTIFICATE_CHOOSER_DIALOG (self));
+	dialog = GCR_CERTIFICATE_CHOOSER_DIALOG (self);
+
+	if (dialog->cert_uri)
+		g_free (dialog->cert_uri);
+	dialog->cert_uri = g_strdup (cert_uri);
+}
+
+static gchar *
+gcr_certificate_chooser_dialog_get_cert_uri (GcrCertificateChooser *self)
+{
+	g_return_val_if_fail (GCR_IS_CERTIFICATE_CHOOSER_DIALOG (self), NULL);
+
+	return GCR_CERTIFICATE_CHOOSER_DIALOG (self)->cert_uri;
+}
+
+static void
+gcr_certificate_chooser_dialog_set_cert_password (GcrCertificateChooser *self, const gchar *cert_password)
+{
+	GcrCertificateChooserDialog *dialog;
+
+	g_return_if_fail (GCR_IS_CERTIFICATE_CHOOSER_DIALOG (self));
+	dialog = GCR_CERTIFICATE_CHOOSER_DIALOG (self);
+
+	if (dialog->cert_password)
+		g_free (dialog->cert_password);
+	dialog->cert_password = g_strdup (cert_password);
+}
+
+static gchar *
+gcr_certificate_chooser_dialog_get_cert_password (GcrCertificateChooser *self)
+{
+	g_return_val_if_fail (GCR_IS_CERTIFICATE_CHOOSER_DIALOG (self), NULL);
+
+	return GCR_CERTIFICATE_CHOOSER_DIALOG (self)->cert_password;
+}
+
+static void
+gcr_certificate_chooser_dialog_set_key_uri (GcrCertificateChooser *self, const gchar *key_uri)
+{
+	GcrCertificateChooserDialog *dialog;
+
+	g_return_if_fail (GCR_IS_CERTIFICATE_CHOOSER_DIALOG (self));
+	dialog = GCR_CERTIFICATE_CHOOSER_DIALOG (self);
+
+	if (dialog->key_uri)
+		g_free (dialog->key_uri);
+	dialog->key_uri = g_strdup (key_uri);
+}
+
+static gchar *
+gcr_certificate_chooser_dialog_get_key_uri (GcrCertificateChooser *self)
+{
+	g_return_val_if_fail (GCR_IS_CERTIFICATE_CHOOSER_DIALOG (self), NULL);
+
+	return GCR_CERTIFICATE_CHOOSER_DIALOG (self)->key_uri;
+}
+
+static void
+gcr_certificate_chooser_dialog_set_key_password (GcrCertificateChooser *self, const gchar *key_password)
+{
+	GcrCertificateChooserDialog *dialog;
+
+	g_return_if_fail (GCR_IS_CERTIFICATE_CHOOSER_DIALOG (self));
+	dialog = GCR_CERTIFICATE_CHOOSER_DIALOG (self);
+
+	if (dialog->key_password)
+		g_free (dialog->key_password);
+	dialog->key_password = g_strdup (key_password);
+}
+
+static gchar *
+gcr_certificate_chooser_dialog_get_key_password (GcrCertificateChooser *self)
+{
+	g_return_val_if_fail (GCR_IS_CERTIFICATE_CHOOSER_DIALOG (self), NULL);
+
+	return GCR_CERTIFICATE_CHOOSER_DIALOG (self)->key_password;
+}
+
+static void
+dialog_gcr_certificate_chooser_iface_init (GcrCertificateChooserInterface *iface)
+{
+	iface->set_cert_uri = gcr_certificate_chooser_dialog_set_cert_uri;
+	iface->get_cert_uri = gcr_certificate_chooser_dialog_get_cert_uri;
+	iface->set_cert_password = gcr_certificate_chooser_dialog_set_cert_password;
+	iface->get_cert_password = gcr_certificate_chooser_dialog_get_cert_password;
+	iface->set_key_uri = gcr_certificate_chooser_dialog_set_key_uri;
+	iface->get_key_uri = gcr_certificate_chooser_dialog_get_key_uri;
+	iface->set_key_password = gcr_certificate_chooser_dialog_set_key_password;
+	iface->get_key_password = gcr_certificate_chooser_dialog_get_key_password;
 }
 
 static void
