@@ -44,6 +44,10 @@ struct _GcrCertificateChooserPkcs11 {
         GckSession *session;
         GList *objects;
         GcrCollection *collection;
+        gchar *cert_uri;
+        gchar *cert_password;
+        gchar *key_password;
+        gchar *key_uri;
 };
 
 struct _GcrCertificateChooserPkcs11Class {
@@ -52,7 +56,10 @@ struct _GcrCertificateChooserPkcs11Class {
 
 typedef struct _GcrCertificateChooserPkcs11Class GcrCertificateChooserPkcs11Class;
 
-G_DEFINE_TYPE (GcrCertificateChooserPkcs11, gcr_certificate_chooser_pkcs11, GTK_TYPE_SCROLLED_WINDOW);
+static void pkcs11_gcr_certificate_chooser_iface_init (GcrCertificateChooserInterface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (GcrCertificateChooserPkcs11, gcr_certificate_chooser_pkcs11, GTK_TYPE_SCROLLED_WINDOW,
+                         G_IMPLEMENT_INTERFACE (GCR_TYPE_CERTIFICATE_CHOOSER, pkcs11_gcr_certificate_chooser_iface_init));
 
 /**
  * on_cell_renderer_object: (skip)
@@ -140,7 +147,7 @@ on_tree_node_select (GtkTreeModel *model,
                  gcr_certificate_widget_set_certificate (GCR_CERTIFICATE_WIDGET (gtk_builder_get_object
                                                         (self->builder, "certficate-info")), certificate);
                  uri_data->attributes = cert_attributes;
-                 cert_uri = gck_uri_build (uri_data, GCK_URI_FOR_ANY);
+                 self->cert_uri = gck_uri_build (uri_data, GCK_URI_FOR_ANY);
 
                  gtk_label_set_text(GTK_LABEL(gtk_builder_get_object(
                                     self->builder, "key-label")),
@@ -175,7 +182,7 @@ on_tree_node_select (GtkTreeModel *model,
                                             gcr_key_widget_set_attributes (GCR_KEY_WIDGET (gtk_builder_get_object
                                                                             (self->builder, "key-info")), key_attributes);
                                             uri_data->attributes = key_attributes;
-                                            key_uri = gck_uri_build (uri_data, GCK_URI_FOR_ANY);
+                                            self->key_uri = gck_uri_build (uri_data, GCK_URI_FOR_ANY);
                                    }
                           }
                  }
@@ -207,7 +214,7 @@ on_tree_node_select (GtkTreeModel *model,
                                                         (self->builder, "key-info")), key_attributes);
 
                           uri_data->attributes = key_attributes;
-                          key_uri = gck_uri_build (uri_data, GCK_URI_FOR_ANY);
+                          self->key_uri = gck_uri_build (uri_data, GCK_URI_FOR_ANY);
 
                           gtk_label_set_text(GTK_LABEL(gtk_builder_get_object(
                                                        self->builder, "key-label")), "Key selected");
@@ -217,6 +224,8 @@ on_tree_node_select (GtkTreeModel *model,
                 }
 
         }
+
+        g_signal_emit_by_name (self, "certificate-selected");
 }
 
 /** on_tree_view_selection_changed: (skip)
@@ -372,6 +381,103 @@ gcr_certificate_chooser_pkcs11_constructed (GObject *obj)
 
         gtk_widget_show (GTK_WIDGET (self->tree_view));
  }
+
+static void
+gcr_certificate_chooser_pkcs11_set_cert_uri (GcrCertificateChooser *self, const gchar *cert_uri)
+{
+	GcrCertificateChooserPkcs11 *pkcs11;
+
+	g_return_if_fail (GCR_IS_CERTIFICATE_CHOOSER_PKCS11 (self));
+	pkcs11 = GCR_CERTIFICATE_CHOOSER_PKCS11 (self);
+
+	if (pkcs11->cert_uri)
+		g_free (pkcs11->cert_uri);
+	pkcs11->cert_uri = g_strdup (cert_uri);
+}
+
+static gchar *
+gcr_certificate_chooser_pkcs11_get_cert_uri (GcrCertificateChooser *self)
+{
+	g_return_val_if_fail (GCR_IS_CERTIFICATE_CHOOSER_PKCS11 (self), NULL);
+
+	return GCR_CERTIFICATE_CHOOSER_PKCS11 (self)->cert_uri;
+}
+
+static void
+gcr_certificate_chooser_pkcs11_set_cert_password (GcrCertificateChooser *self, const gchar *cert_password)
+{
+	GcrCertificateChooserPkcs11 *pkcs11;
+
+	g_return_if_fail (GCR_IS_CERTIFICATE_CHOOSER_PKCS11 (self));
+	pkcs11 = GCR_CERTIFICATE_CHOOSER_PKCS11 (self);
+
+	if (pkcs11->cert_password)
+		g_free (pkcs11->cert_password);
+	pkcs11->cert_password = g_strdup (cert_password);
+}
+
+static gchar *
+gcr_certificate_chooser_pkcs11_get_cert_password (GcrCertificateChooser *self)
+{
+	g_return_val_if_fail (GCR_IS_CERTIFICATE_CHOOSER_PKCS11 (self), NULL);
+
+	return GCR_CERTIFICATE_CHOOSER_PKCS11 (self)->cert_password;
+}
+
+static void
+gcr_certificate_chooser_pkcs11_set_key_uri (GcrCertificateChooser *self, const gchar *key_uri)
+{
+	GcrCertificateChooserPkcs11 *pkcs11;
+
+	g_return_if_fail (GCR_IS_CERTIFICATE_CHOOSER_PKCS11 (self));
+	pkcs11 = GCR_CERTIFICATE_CHOOSER_PKCS11 (self);
+
+	if (pkcs11->key_uri)
+		g_free (pkcs11->key_uri);
+	pkcs11->key_uri = g_strdup (key_uri);
+}
+
+static gchar *
+gcr_certificate_chooser_pkcs11_get_key_uri (GcrCertificateChooser *self)
+{
+	g_return_val_if_fail (GCR_IS_CERTIFICATE_CHOOSER_PKCS11 (self), NULL);
+
+	return GCR_CERTIFICATE_CHOOSER_PKCS11 (self)->key_uri;
+}
+
+static void
+gcr_certificate_chooser_pkcs11_set_key_password (GcrCertificateChooser *self, const gchar *key_password)
+{
+	GcrCertificateChooserPkcs11 *pkcs11;
+
+	g_return_if_fail (GCR_IS_CERTIFICATE_CHOOSER_PKCS11 (self));
+	pkcs11 = GCR_CERTIFICATE_CHOOSER_PKCS11 (self);
+
+	if (pkcs11->key_password)
+		g_free (pkcs11->key_password);
+	pkcs11->key_password = g_strdup (key_password);
+}
+
+static gchar *
+gcr_certificate_chooser_pkcs11_get_key_password (GcrCertificateChooser *self)
+{
+	g_return_val_if_fail (GCR_IS_CERTIFICATE_CHOOSER_PKCS11 (self), NULL);
+
+	return GCR_CERTIFICATE_CHOOSER_PKCS11 (self)->key_password;
+}
+
+static void
+pkcs11_gcr_certificate_chooser_iface_init (GcrCertificateChooserInterface *iface)
+{
+	iface->set_cert_uri = gcr_certificate_chooser_pkcs11_set_cert_uri;
+	iface->get_cert_uri = gcr_certificate_chooser_pkcs11_get_cert_uri;
+	iface->set_cert_password = gcr_certificate_chooser_pkcs11_set_cert_password;
+	iface->get_cert_password = gcr_certificate_chooser_pkcs11_get_cert_password;
+	iface->set_key_uri = gcr_certificate_chooser_pkcs11_set_key_uri;
+	iface->get_key_uri = gcr_certificate_chooser_pkcs11_get_key_uri;
+	iface->set_key_password = gcr_certificate_chooser_pkcs11_set_key_password;
+	iface->get_key_password = gcr_certificate_chooser_pkcs11_get_key_password;
+}
 
 static void
 gcr_certificate_chooser_pkcs11_class_init (GcrCertificateChooserPkcs11Class *klass)
