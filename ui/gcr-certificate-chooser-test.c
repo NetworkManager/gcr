@@ -22,6 +22,7 @@
 
 #include "config.h"
 
+#include "gcr-certificate-chooser.h"
 #include "gcr-certificate-chooser-dialog.h"
 
 #include <glib/gi18n.h>
@@ -84,6 +85,15 @@ main (int argc, char *argv[])
 
 	dialog = gcr_certificate_chooser_dialog_new (NULL);
 	gcr_certificate_chooser_dialog_run(dialog);
+
+        printf ("The selected certificate uri is %s\n",
+                gcr_certificate_chooser_get_cert_uri (GCR_CERTIFICATE_CHOOSER (dialog)));
+        printf ("The selected certificate password is %s\n",
+                gcr_certificate_chooser_get_cert_password (GCR_CERTIFICATE_CHOOSER (dialog)));
+        printf ("The selected key uri is %s\n",
+                gcr_certificate_chooser_get_key_uri (GCR_CERTIFICATE_CHOOSER (dialog)));
+        printf ("The selected key password is %s\n",
+                gcr_certificate_chooser_get_key_password (GCR_CERTIFICATE_CHOOSER (dialog)));
 
 	//	gtk_main ();
 

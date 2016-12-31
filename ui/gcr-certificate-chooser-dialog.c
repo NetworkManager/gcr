@@ -354,12 +354,8 @@ static void
 on_confirm_button_clicked (GtkWidget *widget,
                            gpointer data)
 {
-	GcrCertificateChooserDialog *self = GCR_CERTIFICATE_CHOOSER_DIALOG (data);
-
-        printf ("The selected certificate uri is %s\n", self->cert_uri);
-        printf ("The selected certificate password is %s\n", self->cert_password);
-        printf ("The selected key uri is %s\n", self->key_uri);
-        printf ("The selected key password is %s\n", self->key_password);
+	/* XXX: this should be dealt with in the dialog action area. */
+	gtk_dialog_response (GTK_DIALOG (data), GTK_RESPONSE_OK);
 }
 
 static void
