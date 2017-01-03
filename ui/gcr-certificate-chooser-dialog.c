@@ -925,7 +925,7 @@ gcr_certificate_chooser_dialog_constructed (GObject *obj)
                          "clicked", G_CALLBACK (
                          on_confirm_button_clicked), self);
 
-	gtk_widget_show_all(GTK_WIDGET (self));
+	gtk_widget_show_all(content);
 
         gtk_window_set_title(GTK_WINDOW(self), "Choose Certificate");
 	gtk_window_set_modal (GTK_WINDOW (self), TRUE);
