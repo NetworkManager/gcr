@@ -1,0 +1,13 @@
+* Why is GcrCertificateChooserDialog not more like the GtkDialog?
+  In particular the action area could look more like the stock one, with the button bar, etc.
+  Also, a separate _dialog_run() is probably not needed?
+
+* #include "gcr-certificate-chooser-pkcs11.c"
+
+* A lot of missing g_free()s
+
+* Should a certificate and key choice emit different signals?
+
+* stored_uri & stored_password are global variables
+
+* Should the button indicate a key is chosen?
