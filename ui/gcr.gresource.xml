@@ -4,5 +4,6 @@
 		<file preprocess="xml-stripblanks">gcr-pkcs11-import-dialog.ui</file>
 		<file preprocess="xml-stripblanks">gcr-unlock-options-widget.ui</file>
 		<file preprocess="xml-stripblanks">gcr-certificate-chooser-dialog.ui</file>
+		<file preprocess="xml-stripblanks">gcr-certificate-chooser-button.ui</file>
 	</gresource>
 </gresources>

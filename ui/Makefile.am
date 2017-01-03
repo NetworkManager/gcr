@@ -75,6 +75,7 @@ ui_inc_HEADERS = \
 ui_PUBLIC_FILES = \
 	ui/gcr-certificate-chooser.c ui/gcr-certificate-chooser.h \
 	ui/gcr-certificate-chooser-dialog.c ui/gcr-certificate-chooser-dialog.h \
+	ui/gcr-certificate-chooser-button.c ui/gcr-certificate-chooser-button.h \
 	ui/gcr-certificate-renderer.c ui/gcr-certificate-renderer.h \
 	ui/gcr-certificate-widget.c ui/gcr-certificate-widget.h \
 	ui/gcr-collection-model.c ui/gcr-collection-model.h \
