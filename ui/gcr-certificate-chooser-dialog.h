@@ -52,9 +52,9 @@ GType                   gcr_certificate_chooser_sidebar_get_type     (void) G_GN
 
 GType                   gcr_certificate_chooser_pkcs11_get_type     (void) G_GNUC_CONST;
 
-GList                   *stored_uri = NULL;
+extern GList           *stored_uri;
 
-GList                   *stored_password = NULL;
+extern GList           *stored_password;
 
 gchar                   *cert_uri = NULL;
 

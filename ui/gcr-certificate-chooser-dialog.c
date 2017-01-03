@@ -67,6 +67,10 @@
 #define GCR_IS_CERTIFICATE_CHOOSER_SIDEBAR_CLASS(klass)        (G_TYPE_CHECK_CLASS_TYPE ((klass), GCR_TYPE_CERTIFICATE_CHOOSER_SIDEBAR))
 #define GCR_CERTIFICATE_CHOOSER_SIDEBAR_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), GCR_TYPE_CERTIFICATE_CHOOSER_SIDEBAR, GcrCertificateChooserSidebarClass))
 
+GList                   *stored_uri = NULL;
+
+GList                   *stored_password = NULL;
+
 struct _GcrCertificateChooserDialog {
        GtkDialog parent;
        GList *slots;
