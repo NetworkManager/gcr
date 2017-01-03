@@ -717,11 +717,15 @@ on_update_preview(GtkWidget *widget, gpointer *user_data)
         if (!gcr_parser_parse_bytes (self->parser, bytes, &err))
             printf("couldn't parse data: %s\n", err->message);
 
+#if 0
+	/* XXX: No, why? Filename is a file system path ("/dir/dir/file")
+	 * while the cert_uri for that path is an URI ("file:///dir/dir/file"). */
 	if (self->certificate_uri && g_strcmp0(self->certificate_uri,
                                                filename) != 0) {
 		g_free(self->certificate_uri);
 		self->certificate_uri = NULL;
 	}
+#endif
 	g_free(filename);
 }
 
